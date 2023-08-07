@@ -72,6 +72,10 @@ declare module '@rocket.chat/ui-contexts' {
 			pattern: '/omnichannel/realtime-monitoring';
 			pathname: `/omnichannel/realtime-monitoring`;
 		};
+		'omnichannel-reports': {
+			pattern: '/omnichannel/reports';
+			pathname: `/omnichannel/reports`;
+		};
 	}
 }
 
@@ -149,4 +153,9 @@ registerOmnichannelRoute('/realtime-monitoring', {
 registerOmnichannelRoute('/analytics', {
 	name: 'omnichannel-analytics',
 	component: lazy(() => import('./analytics/AnalyticsPage')),
+});
+
+registerOmnichannelRoute('/reports', {
+	name: 'omnichannel-reports',
+	component: lazy(() => import('./reports/ReportsPage')),
 });
