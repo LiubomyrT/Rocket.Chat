@@ -1,8 +1,8 @@
 import { Palette } from '@rocket.chat/fuselage';
-import { useTranslation } from '@rocket.chat/ui-contexts';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
+import { usePeriodSelectorState } from '../../../components/dashboards/usePeriodSelectorState';
 import { MOCK_DEPARTMENTS_DATA } from '../mock';
 
 const colors = {
@@ -19,14 +19,21 @@ const formatChartData = (data: { label: string; value: number }[] | undefined = 
 	}));
 
 export const useDepartmentsSection = () => {
-	const t = useTranslation();
-	const [filters, onFilter] = useState({});
+	// const t = useTranslation();
+	const [period, periodSelectorProps] = usePeriodSelectorState(
+		'today',
+		'this week',
+		'last 15 days',
+		'this month',
+		'last 6 months',
+		'last year',
+	);
 
 	const {
 		data: { data: rawData } = {},
 		isLoading,
 		isError,
-	} = useQuery(['reports', 'departments'], () => {
+	} = useQuery(['reports', 'departments', period], () => {
 		return Promise.resolve(MOCK_DEPARTMENTS_DATA);
 	});
 
@@ -34,9 +41,8 @@ export const useDepartmentsSection = () => {
 
 	return {
 		data,
-		filters,
 		isLoading,
 		isError,
-		onFilter,
+		periodSelectorProps,
 	};
 };

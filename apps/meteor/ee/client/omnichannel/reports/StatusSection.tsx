@@ -7,10 +7,10 @@ import { useStatusSection } from './hooks/useStatusSection';
 
 export const StatusSection = () => {
 	const t = useTranslation();
-	const { data, onFilter } = useStatusSection();
+	const { data, periodSelectorProps } = useStatusSection();
 
 	return (
-		<ReportCard title={t('Status')} onFilter={onFilter}>
+		<ReportCard title={t('Status')} periodSelectorProps={periodSelectorProps}>
 			<PieChart data={data} width={300} height={200} />
 		</ReportCard>
 	);

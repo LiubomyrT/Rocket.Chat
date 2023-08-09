@@ -7,10 +7,10 @@ import { useDepartmentsSection } from './hooks/useDepartmentsSection';
 
 export const DepartmentsSection = () => {
 	const t = useTranslation();
-	const { data, onFilter } = useDepartmentsSection();
+	const { data, periodSelectorProps } = useDepartmentsSection();
 
 	return (
-		<ReportCard title={t('Departments')} onFilter={onFilter}>
+		<ReportCard title={t('Departments')} periodSelectorProps={periodSelectorProps}>
 			<BarChart data={data} direction='horizontal' height={360} />
 		</ReportCard>
 	);

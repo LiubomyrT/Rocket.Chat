@@ -2,8 +2,9 @@ import { Palette } from '@rocket.chat/fuselage';
 import type { TranslationContextValue } from '@rocket.chat/ui-contexts';
 import { useTranslation } from '@rocket.chat/ui-contexts';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
+import { usePeriodSelectorState } from '../../../components/dashboards/usePeriodSelectorState';
 import type { StatusData } from '../mock';
 import { MOCK_STATUS_DATA } from '../mock';
 
@@ -43,13 +44,20 @@ const formatChartData = (data: StatusData['data'] | undefined, t: TranslationCon
 
 export const useStatusSection = () => {
 	const t = useTranslation();
-	const [filters, onFilter] = useState({});
+	const [period, periodSelectorProps] = usePeriodSelectorState(
+		'today',
+		'this week',
+		'last 15 days',
+		'this month',
+		'last 6 months',
+		'last year',
+	);
 
 	const {
 		data: { data: rawData } = {},
 		isLoading,
 		isError,
-	} = useQuery(['reports', 'status'], () => {
+	} = useQuery(['reports', 'status', period], () => {
 		return Promise.resolve(MOCK_STATUS_DATA);
 	});
 
@@ -57,9 +65,8 @@ export const useStatusSection = () => {
 
 	return {
 		data,
-		filters,
 		isLoading,
 		isError,
-		onFilter,
+		periodSelectorProps,
 	};
 };
