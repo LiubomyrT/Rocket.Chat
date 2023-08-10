@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getPeriodRange } from '../../../components/dashboards/periods';
 import { usePeriodSelectorState } from '../../../components/dashboards/usePeriodSelectorState';
-import { MOCK_TAGS_DATA } from '../mock';
 
 const colors = {
 	warning: Palette.statusColor['status-font-on-warning'].toString(),
@@ -31,16 +30,15 @@ export const useTagsSection = () => {
 
 	const { start, end } = getPeriodRange(period);
 
-	const getConversationsByTags = useEndpoint('GET', 'livechat/analytics/dashboards/conversations-by-tags');
+	const getConversationsByTags = useEndpoint('GET', '/v1/livechat/analytics/dashboards/conversations-by-tags');
 
 	const {
 		data = [],
 		isLoading,
 		isError,
-	} = useQuery(['reports', 'tags', period], () => {
-		// const data = await getConversationsByTags({ start: start.toISOString(), end: end.toISOString() });
-		// return formatChartData(data);
-		return Promise.resolve(formatChartData(MOCK_TAGS_DATA.data));
+	} = useQuery(['reports', 'tags', period], async () => {
+		const { data } = await getConversationsByTags({ start: start.toISOString(), end: end.toISOString() });
+		return formatChartData(data);
 	});
 
 	return {

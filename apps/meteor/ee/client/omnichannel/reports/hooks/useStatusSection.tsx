@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { getPeriodRange } from '../../../components/dashboards/periods';
 import { usePeriodSelectorState } from '../../../components/dashboards/usePeriodSelectorState';
 import { COLORS } from '../components/constants';
-import { MOCK_STATUS_DATA } from '../mock';
 
 const STATUS_COLORS: Record<string, string> = {
 	'Open': COLORS.success,
@@ -28,16 +27,15 @@ export const useStatusSection = () => {
 
 	const { start, end } = getPeriodRange(period);
 
-	const getConversationsByStatus = useEndpoint('GET', 'livechat/analytics/dashboards/conversations-by-status');
+	const getConversationsByStatus = useEndpoint('GET', '/v1/livechat/analytics/dashboards/conversations-by-status');
 
 	const {
 		data = [],
 		isLoading,
 		isError,
 	} = useQuery(['reports', 'status', 'livechat/analytics/dashboards/conversations-by-status', period], async () => {
-		// const data = await getConversationsByStatus({ start: start.toISOString(), end: end.toISOString() });
-		// return formatChartData(data);
-		return formatChartData(MOCK_STATUS_DATA.data);
+		const { data } = await getConversationsByStatus({ start: start.toISOString(), end: end.toISOString() });
+		return formatChartData(data);
 	});
 
 	return {
