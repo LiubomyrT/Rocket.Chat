@@ -15,7 +15,7 @@ type ReportCardProps = {
 
 export const ReportCard = ({ title, children, periodSelectorProps }: ReportCardProps) => {
 	return (
-		<Card>
+		<Card overflow='hidden'>
 			<Card.Title>
 				<Box display='flex' justifyContent='space-between' alignItems='center' wrap='no-wrap'>
 					{title}
@@ -24,7 +24,6 @@ export const ReportCard = ({ title, children, periodSelectorProps }: ReportCardP
 					</Box>
 				</Box>
 			</Card.Title>
-
 			<Card.Body>
 				<Card.Col>
 					<CardErrorBoundary>{children}</CardErrorBoundary>
