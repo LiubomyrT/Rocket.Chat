@@ -1,5 +1,7 @@
+import { useEndpoint } from '@rocket.chat/ui-contexts';
 import { useQuery } from '@tanstack/react-query';
 
+import { getPeriodRange } from '../../../components/dashboards/periods';
 import { usePeriodSelectorState } from '../../../components/dashboards/usePeriodSelectorState';
 import { COLORS } from '../components/constants';
 import { MOCK_CHANNELS_DATA } from '../mock';
@@ -21,11 +23,17 @@ export const useChannelsSection = () => {
 		'last year',
 	);
 
+	const { start, end } = getPeriodRange(period);
+
+	const getConversationsBySource = useEndpoint('GET', 'livechat/analytics/dashboards/conversations-by-source');
+
 	const {
 		data = [],
 		isLoading,
 		isError,
 	} = useQuery(['reports', 'channels', period], () => {
+		// const data = await getConversationsBySource({ start: start.toISOString(), end: end.toISOString() });
+		// return formatChartData(data);
 		return Promise.resolve(formatChartData(MOCK_CHANNELS_DATA.data));
 	});
 
