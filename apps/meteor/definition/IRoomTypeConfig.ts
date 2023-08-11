@@ -60,6 +60,13 @@ export interface IRoomTypeConfig {
 	route?: IRoomTypeRouteConfig<RouteName>;
 }
 
+export interface IRoomTopic {
+	userName: string;
+	hotelName: string;
+	userId: string;
+	managerIds: string[];
+}
+
 export interface IRoomTypeClientConfig extends IRoomTypeConfig {
 	label?: string;
 }
@@ -96,6 +103,8 @@ export interface IRoomTypeServerDirectives {
 	allowRoomSettingChange: (room: IRoom, setting: ValueOf<typeof RoomSettingsEnum>) => boolean;
 	allowMemberAction: (room: IRoom, action: ValueOf<typeof RoomMemberActions>, userId?: IUser['_id']) => Promise<boolean>;
 	roomName: (room: IRoom, userId?: string) => Promise<string | undefined>;
+	roomNameCustom: (room: IRoom, userId?: string) => Promise<string | undefined>;
+	roomTopic: (room: IRoom, userId?: string) => Promise<IRoomTopic | undefined>;
 	isGroupChat: (room: IRoom) => boolean;
 	canBeDeleted: (hasPermission: (permissionId: string, rid?: string) => Promise<boolean> | boolean, room: IRoom) => Promise<boolean>;
 	preventRenaming: () => boolean;
