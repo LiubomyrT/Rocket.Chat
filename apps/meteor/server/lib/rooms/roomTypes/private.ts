@@ -2,6 +2,7 @@ import type { IRoom } from '@rocket.chat/core-typings';
 import { isRoomFederated } from '@rocket.chat/core-typings';
 
 import { settings } from '../../../../app/settings/server';
+import type { IRoomTopic } from '../../../../definition/IRoomTypeConfig';
 import { RoomSettingsEnum, RoomMemberActions } from '../../../../definition/IRoomTypeConfig';
 import { getPrivateRoomType } from '../../../../lib/rooms/roomTypes/private';
 import { roomCoordinator } from '../roomCoordinator';
@@ -52,6 +53,39 @@ roomCoordinator.add(PrivateRoomType, {
 		}
 
 		return room.name;
+	},
+
+	async roomNameCustom(room, _userId?) {
+		try {
+			const topic = await this.roomTopic?.(room);
+			if (!topic || !_userId) {
+				return this.roomName?.(room, _userId);
+			}
+
+			if (_userId === topic.userId) {
+				return topic.hotelName ?? '';
+			}
+
+			if (topic.managerIds.includes(_userId)) {
+				return `${topic.userName} - ${topic.hotelName}`;
+			}
+
+			return 'No room name';
+		} catch (error) {
+			console.error(`[CUSTOM] Occurred while getting room custom name: `, error);
+			return this.roomName?.(room, _userId);
+		}
+	},
+
+	async roomTopic(room) {
+		try {
+			if (!room.topic) {
+				return;
+			}
+			return JSON.parse(room.topic) as IRoomTopic;
+		} catch (error) {
+			console.error(`Error while parsing topic`);
+		}
 	},
 
 	isGroupChat(_room) {

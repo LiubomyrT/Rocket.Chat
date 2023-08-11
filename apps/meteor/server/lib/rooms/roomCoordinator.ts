@@ -1,7 +1,13 @@
 import type { IRoom, RoomType, IUser, IMessage, ReadReceipt, ValueOf, AtLeast } from '@rocket.chat/core-typings';
 import { Users } from '@rocket.chat/models';
 
-import type { IRoomTypeConfig, IRoomTypeServerDirectives, RoomSettingsEnum, RoomMemberActions } from '../../../definition/IRoomTypeConfig';
+import type {
+	IRoomTypeConfig,
+	IRoomTypeServerDirectives,
+	RoomSettingsEnum,
+	RoomMemberActions,
+	IRoomTopic,
+} from '../../../definition/IRoomTypeConfig';
 import { RoomCoordinator } from '../../../lib/rooms/coordinator';
 import { settings } from '../../../app/settings/server';
 
@@ -81,6 +87,17 @@ class RoomCoordinatorServer extends RoomCoordinator {
 
 	async getRoomName(roomType: string, roomData: IRoom, userId?: string): Promise<string> {
 		return (await this.getRoomDirectives(roomType).roomName(roomData, userId)) ?? '';
+	}
+
+	async getRoomNameCustom(roomType: string, roomData: IRoom, userId?: string): Promise<string> {
+		if (typeof this.getRoomDirectives !== 'function' || typeof this.getRoomDirectives(roomType).roomNameCustom !== 'function') {
+			return '';
+		}
+		return (await this.getRoomDirectives(roomType).roomNameCustom(roomData, userId)) ?? '';
+	}
+
+	async getRoomTopic(roomType: string, roomData: IRoom): Promise<IRoomTopic | undefined> {
+		return this.getRoomDirectives(roomType).roomTopic(roomData);
 	}
 
 	setRoomFind(roomType: string, roomFind: Required<Pick<IRoomTypeServerDirectives, 'roomFind'>>['roomFind']): void {

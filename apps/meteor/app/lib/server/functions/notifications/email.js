@@ -7,7 +7,6 @@ import { metrics } from '../../../../metrics/server';
 import { callbacks } from '../../../../../lib/callbacks';
 import { getURL } from '../../../../utils/server';
 import { roomCoordinator } from '../../../../../server/lib/rooms/roomCoordinator';
-import { ltrim } from '../../../../../lib/utils/stringUtils';
 import { i18n } from '../../../../../server/lib/i18n';
 
 let advice = '';
@@ -23,8 +22,11 @@ Meteor.startup(() => {
 
 async function getEmailContent({ message, user, room }) {
 	const lng = (user && user.language) || settings.get('Language') || 'en';
+	if (typeof roomCoordinator.getRoomNameCustom !== 'function') {
+		return;
+	}
 
-	const roomName = escapeHTML(`#${await roomCoordinator.getRoomName(room.t, room)}`);
+	const roomName = escapeHTML(`#${await roomCoordinator.getRoomNameCustom(room.t, room, user._id)}`);
 	const userName = escapeHTML(settings.get('UI_Use_Real_Name') ? message.u.name || message.u.username : message.u.username);
 
 	const roomDirectives = roomCoordinator.getRoomDirectives(room.t);
@@ -98,19 +100,22 @@ async function getEmailContent({ message, user, room }) {
 	return header;
 }
 
-const getButtonUrl = (room, subscription, message) => {
-	const basePath = roomCoordinator.getRouteLink(room.t, subscription).replace(Meteor.absoluteUrl(), '');
+const getButtonUrlCustom = async (room, subscription, message, user) => {
+	const roomTopic = await roomCoordinator.getRoomTopic(room.t, room);
+	if (!roomTopic) {
+		return '';
+	}
+	const isManager = roomTopic.managerIds.includes(user._id);
+	const path = `${isManager ? 'manager/' : ''}messages`;
 
-	const path = `${ltrim(basePath, '/')}?msg=${message._id}`;
 	return getURL(
-		path,
+		'',
 		{
 			full: true,
 			cloud: settings.get('Offline_Message_Use_DeepLink'),
-			cloud_route: 'room',
+			cloud_route: path,
 			cloud_params: {
-				rid: room._id,
-				mid: message._id,
+				room_id: room._id,
 			},
 		},
 		settings.get('DeepLink_Url'),
@@ -133,7 +138,7 @@ export async function getEmailData({ message, receiver, sender, subscription, ro
 
 	const emailSubject = Mailer.replace(settings.get(subjectKey), {
 		user: username,
-		room: await roomCoordinator.getRoomName(room.t, room),
+		room: await roomCoordinator.getRoomNameCustom(room.t, room, receiver._id),
 	});
 	const content = await getEmailContent({
 		message,
@@ -141,7 +146,10 @@ export async function getEmailData({ message, receiver, sender, subscription, ro
 		room,
 	});
 
-	const room_path = getButtonUrl(room, subscription, message);
+	const room_path = await getButtonUrlCustom(room, subscription, message, receiver);
+	if (!room_path) {
+		return;
+	}
 
 	const receiverName = settings.get('UI_Use_Real_Name') ? receiver.name || receiver.username : receiver.username;
 
@@ -222,6 +230,8 @@ export function shouldNotifyEmail({
 		(roomType === 'd' ||
 			isHighlighted ||
 			emailNotifications === 'all' ||
+			emailNotifications === 'mentions' ||
+			emailNotifications !== 'nothing' ||
 			hasMentionToUser ||
 			(!disableAllMessageNotifications && hasMentionToAll)) &&
 		(!isThread || hasReplyToThread)

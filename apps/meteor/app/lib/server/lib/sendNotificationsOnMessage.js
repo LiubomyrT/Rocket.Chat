@@ -48,20 +48,19 @@ export const sendNotification = async ({
 		return;
 	}
 
-	if (!subscription.receiver) {
-		subscription.receiver = [
-			await Users.findOneById(subscription.u._id, {
-				projection: {
-					active: 1,
-					emails: 1,
-					language: 1,
-					status: 1,
-					statusConnection: 1,
-					username: 1,
-				},
-			}),
-		];
-	}
+	subscription.receiver = [
+		await Users.findOneById(subscription.u._id, {
+			projection: {
+				_id: 1,
+				active: 1,
+				emails: 1,
+				language: 1,
+				status: 1,
+				statusConnection: 1,
+				username: 1,
+			},
+		}),
+	];
 
 	const [receiver] = subscription.receiver;
 
@@ -147,22 +146,24 @@ export const sendNotification = async ({
 		})
 	) {
 		for await (const email of receiver.emails) {
-			if (email.verified) {
-				queueItems.push({
-					type: 'email',
-					data: await getEmailData({
-						message,
-						receiver,
-						sender,
-						subscription,
-						room,
-						emailAddress: email.address,
-						hasMentionToUser,
-					}),
-				});
-
-				break;
+			const emailData = await getEmailData({
+				message,
+				receiver,
+				sender,
+				subscription,
+				room,
+				emailAddress: email.address,
+				hasMentionToUser,
+			});
+			if (!emailData) {
+				continue;
 			}
+			queueItems.push({
+				type: 'email',
+				data: emailData,
+			});
+
+			break;
 		}
 	}
 
