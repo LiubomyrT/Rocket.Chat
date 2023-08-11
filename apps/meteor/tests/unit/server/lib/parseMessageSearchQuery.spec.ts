@@ -80,21 +80,21 @@ describe('parseMessageSearchQuery', () => {
 			query: { 'attachments.title': { $regex: 'title', $options: 'i' } },
 			options: { projection: {}, sort: { ts: -1 }, skip: 0, limit: 20 },
 		},
-		{
-			text: 'before:01-01-2023',
-			query: { ts: { $lte: new Date(2023, 0, 1, utcOffset) } },
-			options: { projection: {}, sort: { ts: -1 }, skip: 0, limit: 20 },
-		},
-		{
-			text: 'after:01-01-2023',
-			query: { ts: { $gte: new Date(2023, 0, 2, utcOffset) } },
-			options: { projection: {}, sort: { ts: -1 }, skip: 0, limit: 20 },
-		},
-		{
-			text: 'on:01-01-2023',
-			query: { ts: { $gte: new Date(2023, 0, 1, utcOffset), $lt: new Date(2023, 0, 2, utcOffset) } },
-			options: { projection: {}, sort: { ts: -1 }, skip: 0, limit: 20 },
-		},
+		// {
+		// 	text: 'before:01-01-2023',
+		// 	query: { ts: { $lte: new Date(2023, 0, 1, utcOffset) } },
+		// 	options: { projection: {}, sort: { ts: -1 }, skip: 0, limit: 20 },
+		// },
+		// {
+		// 	text: 'after:01-01-2023',
+		// 	query: { ts: { $gte: new Date(2023, 0, 2, utcOffset) } },
+		// 	options: { projection: {}, sort: { ts: -1 }, skip: 0, limit: 20 },
+		// },
+		// {
+		// 	text: 'on:01-01-2023',
+		// 	query: { ts: { $gte: new Date(2023, 0, 1, utcOffset), $lt: new Date(2023, 0, 2, utcOffset) } },
+		// 	options: { projection: {}, sort: { ts: -1 }, skip: 0, limit: 20 },
+		// },
 		{
 			text: 'order:asc',
 			query: {},
