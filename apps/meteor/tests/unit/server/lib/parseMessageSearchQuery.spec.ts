@@ -8,8 +8,6 @@ describe('parseMessageSearchQuery', () => {
 		user: createFakeUser(),
 	};
 
-	const utcOffset = new Date().getTimezoneOffset() / 60;
-
 	[
 		{
 			text: 'from:rodrigo mention:gabriel chat',
